@@ -9,16 +9,15 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
-use Inertia\Response;
 
 class AuthenticatedSessionController extends Controller
 {
     /**
      * Show the login page.
      */
-    public function create(Request $request): Response
+    public function create(Request $request)
     {
-        return Inertia::render('auth/login', [
+        return Inertia::render('Login', [
             'canResetPassword' => Route::has('password.request'),
             'status' => $request->session()->get('status'),
         ]);
@@ -29,23 +28,25 @@ class AuthenticatedSessionController extends Controller
      */
     public function store(LoginRequest $request): RedirectResponse
     {
+        // Authenticate user
         $request->authenticate();
 
+        // Regenerate session to prevent fixation
         $request->session()->regenerate();
 
-        return redirect()->intended(route('dashboard', absolute: false));
+        // Redirect to intended page or home
+        return redirect()->intended(route('home'));
     }
 
     /**
-     * Destroy an authenticated session.
+     * Destroy an authenticated session (logout).
      */
     public function destroy(Request $request): RedirectResponse
     {
-        Auth::guard('web')->logout();
+        Auth::guard('web')->logout();               // Log out user
+        $request->session()->invalidate();          // Clear session
+        $request->session()->regenerateToken();     // Regenerate CSRF token
 
-        $request->session()->invalidate();
-        $request->session()->regenerateToken();
-
-        return redirect('/');
+        return redirect('/');                        // Redirect to homepage
     }
 }
