@@ -1,16 +1,47 @@
-import { useForm } from '@inertiajs/react';
-import { Link } from '@inertiajs/react';
+import { useForm, Link } from '@inertiajs/react';
+import React from 'react';
 
 export default function Login() {
+    // Initialize form state
     const { data, setData, post, processing, errors } = useForm({
         email: '',
         password: '',
         remember: false,
     });
 
+    // Handle form submit
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
-        post('/login');
+
+        if (!data.email || !data.password) {
+            console.log('Please fill in both email and password.');
+            return;
+        }
+
+        post('/login', {
+            onStart: () => console.log('Submitting login form...'),
+            onSuccess: (response: any) => {
+                const user = response.props?.auth?.user;
+
+                if (!user) {
+                    console.log('No user info returned from server.');
+                    return;
+                }
+
+                // console.log('Login successful:', user);
+
+                // Role-based redirect
+                if (user.role === 'admin') {
+                    window.location.href = '/admin/dashboard';
+                } else {
+                    window.location.href = '/dashboard';
+                }
+            },
+            onError: (errs) => {
+                console.log('Validation errors:', errs);
+            },
+            onFinish: () => console.log('Login request finished.'),
+        });
     };
 
     return (
@@ -21,6 +52,7 @@ export default function Login() {
             >
                 <h2 className="text-2xl font-bold text-center">Login</h2>
 
+                {/* Email input */}
                 <div className="flex flex-col">
                     <input
                         type="email"
@@ -28,10 +60,14 @@ export default function Login() {
                         value={data.email}
                         onChange={(e) => setData('email', e.target.value)}
                         className="w-full border border-gray-300 dark:border-gray-600 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                        required
                     />
-                    {errors.email && <span className="text-red-500 text-sm mt-1">{errors.email}</span>}
+                    {errors.email && (
+                        <span className="text-red-500 text-sm mt-1">{errors.email}</span>
+                    )}
                 </div>
 
+                {/* Password input */}
                 <div className="flex flex-col">
                     <input
                         type="password"
@@ -39,10 +75,14 @@ export default function Login() {
                         value={data.password}
                         onChange={(e) => setData('password', e.target.value)}
                         className="w-full border border-gray-300 dark:border-gray-600 p-3 rounded-lg bg-gray-50 dark:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-purple-500 transition-colors"
+                        required
                     />
-                    {errors.password && <span className="text-red-500 text-sm mt-1">{errors.password}</span>}
+                    {errors.password && (
+                        <span className="text-red-500 text-sm mt-1">{errors.password}</span>
+                    )}
                 </div>
 
+                {/* Remember & Forgot */}
                 <div className="flex items-center justify-between">
                     <label className="flex items-center space-x-2">
                         <input
@@ -58,6 +98,7 @@ export default function Login() {
                     </Link>
                 </div>
 
+                {/* Submit button */}
                 <button
                     type="submit"
                     disabled={processing}
@@ -66,7 +107,7 @@ export default function Login() {
                     {processing ? 'Logging in...' : 'Login'}
                 </button>
 
-                {/* Register Button */}
+                {/* Register link */}
                 <div className="text-center">
                     <span className="text-gray-600 dark:text-gray-400">Don't have an account? </span>
                     <Link

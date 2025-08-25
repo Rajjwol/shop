@@ -10,7 +10,6 @@ export default function HomePage() {
 
             <div className="flex flex-col gap-8 p-4">
 
-
             </div>
         </AppLayout>
     );

@@ -1,47 +1,51 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 use Inertia\Inertia;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Admin\AdminDashboardController;
 
-/*
-|--------------------------------------------------------------------------
-| Web Routes
-|--------------------------------------------------------------------------
-*/
-
+// ------------------ Public route ------------------
 Route::get('/', function () {
-    return Inertia::render('dashboard'); // Make sure file is Dashboard.tsx
+    return Inertia::render('dashboard');
 })->name('home');
 
-// Protected routes
+// ------------------ Authentication ------------------
+Route::middleware('guest')->group(function () {
+    Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+    Route::post('/register', [RegisteredUserController::class, 'store']);
+
+    Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+    Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+});
+
+// ------------------ Logout ------------------
+Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
+    ->middleware('auth')
+    ->name('logout');
+
+// ------------------ Protected user routes ------------------
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', function () {
         return Inertia::render('dashboard');
     })->name('dashboard');
 });
 
-// Authentication routes
-Route::get('/register', [RegisteredUserController::class, 'create'])
-    ->middleware('guest')
-    ->name('register');
+// ------------------ Admin routes ------------------
+Route::prefix('admin')->name('admin.')->group(function () {
 
-Route::post('/register', [RegisteredUserController::class, 'store'])
-    ->middleware('guest');
+    Route::get('/dashboard', function () {
+        $user = Auth::user();
 
-// Web routes
-Route::get('/login', [AuthenticatedSessionController::class, 'create'])
-    ->middleware('guest')
-    ->name('login');
+        // Check role from database
+        if ($user && $user->role === 'admin') {
+            return app(AdminDashboardController::class)->index();
+        }
 
-Route::post('/login', [AuthenticatedSessionController::class, 'store'])
-    ->middleware('guest');
+        // Not admin: redirect to homepage
+        return redirect('/'); // or use abort(403) if you prefer
+    })->name('dashboard');
 
-Route::post('/logout', [AuthenticatedSessionController::class, 'destroy'])
-    ->middleware('auth')
-    ->name('logout');
-
-// Additional routes
-require __DIR__.'/settings.php';
-require __DIR__.'/auth.php';
+});

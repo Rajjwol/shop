@@ -26,7 +26,7 @@ class AuthenticatedSessionController extends Controller
     /**
      * Handle an incoming authentication request.
      */
-    public function store(LoginRequest $request): RedirectResponse
+    public function store(LoginRequest $request)
     {
         // Authenticate user
         $request->authenticate();
@@ -34,8 +34,15 @@ class AuthenticatedSessionController extends Controller
         // Regenerate session to prevent fixation
         $request->session()->regenerate();
 
-        // Redirect to intended page or home
-        return redirect()->intended(route('home'));
+        $user = Auth::user();
+
+        // Return Inertia response with user info
+        return Inertia::render('dashboard', [
+            'auth' => [
+                'user' => $user,  // <-- send user info to frontend
+            ],
+            'roleRedirect' => $user->role === 'admin' ? '/Admin/Dashboard' : '/dashboard',
+        ]);
     }
 
     /**

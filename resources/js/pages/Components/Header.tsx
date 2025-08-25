@@ -1,16 +1,25 @@
-import { Link, router } from '@inertiajs/react';
-import { Menu, ShoppingCart, X } from 'lucide-react';
-import { usePage } from '@inertiajs/react';
 import { useState } from 'react';
+import { Link, usePage, router } from '@inertiajs/react';
+import { Menu, ShoppingCart, User, X } from 'lucide-react';
+
+// Type for authenticated user
+interface UserType {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+}
 
 export default function Header() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
-    const { auth } = usePage().props;
+    // Get auth user from Inertia
+    const { auth } = usePage().props as { auth?: { user?: UserType } };
     const authUser = auth?.user;
 
-    const handleLogout = (e) => {
+    // Logout handler
+    const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
         e.preventDefault();
         router.post('/logout');
     };
@@ -42,24 +51,21 @@ export default function Header() {
                         />
 
                         {/* User Actions */}
-                        <div className="flex items-center space-x-4 relative">
+                        <div className="relative flex items-center space-x-4">
                             {authUser ? (
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowLogoutConfirm(!showLogoutConfirm)}
-                                        className="rounded px-3 py-1 transition-colors duration-200 hover:bg-purple-100 hover:text-purple-600 dark:hover:bg-purple-700 dark:hover:text-purple-300"
+                                        className="rounded-full p-2 transition-colors duration-200 hover:bg-purple-100 dark:hover:bg-purple-700"
                                     >
-                                        Logout
+                                        <User className="h-6 w-6 text-purple-600 dark:text-purple-300" />
                                     </button>
 
                                     {showLogoutConfirm && (
-                                        <div className="absolute left-1/2 top-full z-10 mt-2 w-max -translate-x-1/2 rounded bg-black px-3 py-2 text-xs text-white dark:bg-gray-800">
+                                        <div className="absolute top-full left-1/2 z-20 mt-2 w-max -translate-x-1/2 rounded bg-black px-3 py-2 text-xs text-white shadow-lg dark:bg-gray-800">
                                             <p>Are you sure you want to logout?</p>
-                                            <div className="mt-2 flex gap-2 justify-center">
-                                                <button
-                                                    onClick={handleLogout}
-                                                    className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
-                                                >
+                                            <div className="mt-2 flex justify-center gap-2">
+                                                <button onClick={handleLogout} className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">
                                                     Yes
                                                 </button>
                                                 <button
@@ -120,11 +126,8 @@ export default function Header() {
                             {showLogoutConfirm && (
                                 <div className="mt-2 w-full rounded bg-black px-3 py-2 text-xs text-white dark:bg-gray-800">
                                     <p>Are you sure you want to logout?</p>
-                                    <div className="mt-2 flex gap-2 justify-center">
-                                        <button
-                                            onClick={handleLogout}
-                                            className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700"
-                                        >
+                                    <div className="mt-2 flex justify-center gap-2">
+                                        <button onClick={handleLogout} className="rounded bg-red-600 px-3 py-1 text-white hover:bg-red-700">
                                             Yes
                                         </button>
                                         <button
