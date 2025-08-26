@@ -6,6 +6,7 @@ use Inertia\Inertia;
 use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
+use App\Http\Controllers\Admin\ProductController;
 
 // ------------------ Public route ------------------
 Route::get('/', function () {
@@ -49,3 +50,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
     })->name('dashboard');
 
 });
+// ------------------ Admin routes ------------------
+Route::prefix('admin')->name('admin.')->middleware(['auth'])->group(function () {
+    Route::get('/dashboard', [AdminDashboardController::class, 'index'])->name('dashboard');
+    Route::resource('/products', ProductController::class);
+});
+

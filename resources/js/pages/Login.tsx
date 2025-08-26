@@ -28,8 +28,6 @@ export default function Login() {
                     return;
                 }
 
-                // console.log('Login successful:', user);
-
                 // Role-based redirect
                 if (user.role === 'admin') {
                     window.location.href = '/admin/dashboard';
