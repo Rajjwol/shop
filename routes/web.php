@@ -7,12 +7,23 @@ use App\Http\Controllers\Auth\RegisteredUserController;
 use App\Http\Controllers\Auth\AuthenticatedSessionController;
 use App\Http\Controllers\Admin\AdminDashboardController;
 use App\Http\Controllers\Admin\ProductController;
+use App\Http\Controllers\StoreController;
+use App\Http\Controllers\CartController;
 
 // ------------------ Public route ------------------
 Route::get('/', function () {
     return Inertia::render('dashboard');
 })->name('home');
 
+// ------------------ store route ------------------
+Route::get('/', [StoreController::class, 'index'])->name('home');
+Route::get('/products/{id}', [StoreController::class, 'show'])->name('products.show');
+// ------------------ cart route ------------------
+Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::get('/cart', [CartController::class, 'index'])->name('cart.index');
+Route::post('/cart/purchase', [CartController::class, 'purchase'])->name('cart.purchase');
+ Route::post('/dashboard/cart/add', [CartController::class, 'add'])->name('dashboard.cart.add');
+Route::delete('/cart/{product}', [CartController::class, 'remove'])->name('cart.remove');
 // ------------------ Authentication ------------------
 Route::middleware('guest')->group(function () {
     Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
