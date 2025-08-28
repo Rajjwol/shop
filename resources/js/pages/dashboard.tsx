@@ -29,9 +29,9 @@ export default function HomePage() {
 
     useEffect(() => {
         const hour = new Date().getHours();
-        if (hour >= 5 && hour < 12) setHeroImage('/images/hero-morning.jpg');
-        else if (hour >= 12 && hour < 18) setHeroImage('/images/hero-afternoon.jpg');
-        else setHeroImage('/images/hero-evening.jpg');
+        if (hour >= 5 && hour < 12) setHeroImage('/Images/bg.jpg');
+        else if (hour >= 12 && hour < 18) setHeroImage('/Images/bg.jpg');
+        else setHeroImage('/Images/bg.jpg');
     }, []);
 
     // ✅ Fix: addToCart only handles adding

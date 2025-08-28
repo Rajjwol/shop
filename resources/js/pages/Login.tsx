@@ -1,4 +1,4 @@
-import { useForm, Link } from '@inertiajs/react';
+import { useForm, Link, } from '@inertiajs/react';
 import React from 'react';
 
 export default function Login() {

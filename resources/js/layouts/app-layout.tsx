@@ -1,6 +1,6 @@
 
 import Header from '@/pages/Components/Header';
-
+// import Footer from '@/pages/Components/Footer';
 import { type ReactNode } from 'react';
 
 // interface AppLayoutProps {
@@ -25,6 +25,7 @@ export default function AppLayout({ children }: AppLayoutProps) {
             <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
                 {children}
             </main>
+
         </div>
     );
 }

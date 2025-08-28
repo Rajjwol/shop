@@ -6,20 +6,17 @@ use Illuminate\Foundation\Inspiring;
 use Illuminate\Http\Request;
 use Inertia\Middleware;
 use Tighten\Ziggy\Ziggy;
+use App\Models\Purchase;
 
 class HandleInertiaRequests extends Middleware
 {
     /**
      * The root template that's loaded on the first page visit.
-     *
-     * @see https://inertiajs.com/server-side-setup#root-template
      */
     protected $rootView = 'app';
 
     /**
      * Determines the current asset version.
-     *
-     * @see https://inertiajs.com/asset-versioning
      */
     public function version(Request $request): ?string
     {
@@ -28,8 +25,6 @@ class HandleInertiaRequests extends Middleware
 
     /**
      * Define the props that are shared by default.
-     *
-     * @see https://inertiajs.com/shared-data
      */
     public function share(Request $request): array
     {
@@ -48,17 +43,17 @@ class HandleInertiaRequests extends Middleware
             'auth' => [
                 'user' => $request->user()
                     ? [
-                        'id' => $request->user()->id,
-                        'name' => $request->user()->name,
-                         'email' => $request->user()->email,
-                        'role' => $request->user()->role,
+                        'id'    => $request->user()->id,
+                        'name'  => $request->user()->name,
+                        'email' => $request->user()->email,
+                        'role'  => $request->user()->role,
                     ]
                     : null,
             ],
 
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),
-                'error' => fn() => $request->session()->get('error'),
+                'error'   => fn() => $request->session()->get('error'),
             ],
 
             'sidebarOpen' => !$request->hasCookie('sidebar_state') || $request->cookie('sidebar_state') === 'true',
@@ -68,6 +63,12 @@ class HandleInertiaRequests extends Middleware
                 (new Ziggy)->toArray(),
                 ['location' => $request->url()]
             ),
+             // ✅ Cart count from session
+        'cart' => fn() => [
+            'count' => is_array($request->session()->get('cart'))
+                ? array_sum($request->session()->get('cart'))
+                : 0,
+        ],
         ];
     }
 }
