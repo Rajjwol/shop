@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from '@inertiajs/react';
 import AdminLayout from '@/layouts/AdminLayout';
 
@@ -10,17 +10,40 @@ export default function Create() {
     image: null as File | null,
   });
 
+  const [frontErrors, setFrontErrors] = useState<{ [key: string]: string }>({});
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.name === 'image' && e.target.files) {
       setData('image', e.target.files[0]);
     } else {
       setData(e.target.name as keyof typeof data, e.target.value);
     }
+    setFrontErrors((prev) => ({ ...prev, [e.target.name]: '' }));
+  };
+
+  const validate = () => {
+    const newErrors: { [key: string]: string } = {};
+
+    if (!data.name.trim() || data.name.trim().length < 3)
+      newErrors.name = 'Product name must be at least 3 characters.';
+
+    if (!data.price || Number(data.price) <= 0)
+      newErrors.price = 'Price must be greater than 0.';
+
+    if (!data.stock || Number(data.stock) <= 0)
+      newErrors.stock = 'Stock must be greater than 0.';
+
+    if (!data.image) newErrors.image = 'Product image is required.';
+
+    setFrontErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    post(route('admin.products.store'), { forceFormData: true });
+    if (validate()) {
+      post(route('admin.products.store'), { forceFormData: true });
+    }
   };
 
   return (
@@ -46,9 +69,10 @@ export default function Create() {
               onChange={handleChange}
               className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-700 dark:text-white transition"
               placeholder="Enter product name"
-              required
             />
-            {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
+            {(frontErrors.name || errors.name) && (
+              <p className="text-red-500 text-sm mt-1">{frontErrors.name || errors.name}</p>
+            )}
           </div>
 
           {/* Price & Stock */}
@@ -64,9 +88,10 @@ export default function Create() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-700 dark:text-white transition"
                 placeholder="Enter price"
-                required
               />
-              {errors.price && <p className="text-red-500 text-sm mt-1">{errors.price}</p>}
+              {(frontErrors.price || errors.price) && (
+                <p className="text-red-500 text-sm mt-1">{frontErrors.price || errors.price}</p>
+              )}
             </div>
 
             <div>
@@ -80,9 +105,10 @@ export default function Create() {
                 onChange={handleChange}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-400 dark:bg-gray-700 dark:text-white transition"
                 placeholder="Enter stock quantity"
-                required
               />
-              {errors.stock && <p className="text-red-500 text-sm mt-1">{errors.stock}</p>}
+              {(frontErrors.stock || errors.stock) && (
+                <p className="text-red-500 text-sm mt-1">{frontErrors.stock || errors.stock}</p>
+              )}
             </div>
           </div>
 
@@ -98,7 +124,9 @@ export default function Create() {
               accept="image/*"
               className="block w-full text-gray-700 dark:text-gray-200 file:border file:border-gray-300 dark:file:border-gray-600 file:px-4 file:py-2 file:rounded-lg file:bg-gray-100 dark:file:bg-gray-700 file:text-gray-700 dark:file:text-white hover:file:bg-gray-200 dark:hover:file:bg-gray-600 transition"
             />
-            {errors.image && <p className="text-red-500 text-sm mt-1">{errors.image}</p>}
+            {(frontErrors.image || errors.image) && (
+              <p className="text-red-500 text-sm mt-1">{frontErrors.image || errors.image}</p>
+            )}
           </div>
 
           {/* Submit */}

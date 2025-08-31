@@ -1,6 +1,6 @@
-import { useState } from 'react';
-import { Link, usePage, router } from '@inertiajs/react';
+import { Link, router, usePage } from '@inertiajs/react';
 import { Menu, ShoppingCart, User, X } from 'lucide-react';
+import { useState } from 'react';
 
 // Type for authenticated user
 interface UserType {
@@ -15,8 +15,9 @@ export default function Header() {
     const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     // Get auth user from Inertia
-    const { auth } = usePage().props as { auth?: { user?: UserType } };
-    const authUser = auth?.user;
+// Destructure auth and cartCount safely from Inertia props
+const { auth, cartCount = 0 } = usePage().props as { auth?: { user?: UserType }; cartCount?: number };
+const authUser = auth?.user;
 
     // Logout handler
     const handleLogout = (e: React.MouseEvent<HTMLButtonElement>) => {
@@ -37,11 +38,21 @@ export default function Header() {
 
                     {/* Desktop Navigation */}
                     <nav className="hidden items-center space-x-6 md:flex">
-                        <Link href="/" className="hover:text-purple-600 dark:hover:text-purple-400">Home</Link>
-                        <Link href="/products" className="hover:text-purple-600 dark:hover:text-purple-400">Products</Link>
-                        <Link href="/categories" className="hover:text-purple-600 dark:hover:text-purple-400">Categories</Link>
-                        <Link href="/about" className="hover:text-purple-600 dark:hover:text-purple-400">About</Link>
-                        <Link href="/contact" className="hover:text-purple-600 dark:hover:text-purple-400">Contact</Link>
+                        <Link href="/" className="hover:text-purple-600 dark:hover:text-purple-400">
+                            Home
+                        </Link>
+                        <Link href="/products" className="hover:text-purple-600 dark:hover:text-purple-400">
+                            Products
+                        </Link>
+                        <Link href="/categories" className="hover:text-purple-600 dark:hover:text-purple-400">
+                            Categories
+                        </Link>
+                        <Link href="/about" className="hover:text-purple-600 dark:hover:text-purple-400">
+                            About
+                        </Link>
+                        <Link href="/contact" className="hover:text-purple-600 dark:hover:text-purple-400">
+                            Contact
+                        </Link>
 
                         {/* Search Bar */}
                         <input
@@ -89,9 +100,11 @@ export default function Header() {
 
                             <Link href="/cart" className="relative">
                                 <ShoppingCart className="h-6 w-6" />
-                                <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
-                                    3
-                                </span>
+                                {cartCount > 0 && (
+                                    <span className="absolute -top-2 -right-2 flex h-5 w-5 items-center justify-center rounded-full bg-red-500 text-xs text-white">
+                                        {cartCount}
+                                    </span>
+                                )}
                             </Link>
                         </div>
                     </nav>
@@ -108,11 +121,21 @@ export default function Header() {
             {/* Mobile Menu */}
             {mobileMenuOpen && (
                 <div className="bg-white px-4 pt-4 pb-2 shadow-lg md:hidden dark:bg-gray-900">
-                    <Link href="/" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">Home</Link>
-                    <Link href="/products" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">Products</Link>
-                    <Link href="/categories" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">Categories</Link>
-                    <Link href="/about" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">About</Link>
-                    <Link href="/contact" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">Contact</Link>
+                    <Link href="/" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                        Home
+                    </Link>
+                    <Link href="/products" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                        Products
+                    </Link>
+                    <Link href="/categories" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                        Categories
+                    </Link>
+                    <Link href="/about" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                        About
+                    </Link>
+                    <Link href="/contact" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                        Contact
+                    </Link>
 
                     {authUser ? (
                         <div className="relative">
@@ -141,10 +164,14 @@ export default function Header() {
                             )}
                         </div>
                     ) : (
-                        <Link href="/login" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">Login</Link>
+                        <Link href="/login" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                            Login
+                        </Link>
                     )}
 
-                    <Link href="/cart" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">Cart (3)</Link>
+                    <Link href="/cart" className="block py-2 hover:text-purple-600 dark:hover:text-purple-400">
+                        Cart (3)
+                    </Link>
                 </div>
             )}
         </header>

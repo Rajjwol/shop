@@ -1,4 +1,6 @@
 import { useForm, Link } from '@inertiajs/react';
+
+
 import React from 'react';
 
 export default function Login() {
@@ -20,8 +22,9 @@ export default function Login() {
 
         post('/login', {
             onStart: () => console.log('Submitting login form...'),
-            onSuccess: (response: any) => {
-                const user = response.props?.auth?.user;
+            onSuccess: (response: unknown) => {
+                const page = response as { props?: { auth?: { user?: { role?: string } } } };
+                const user = page.props?.auth?.user;
 
                 if (!user) {
                     console.log('No user info returned from server.');
